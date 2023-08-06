@@ -1,8 +1,30 @@
 import Equal from "@/components/Equal";
 import Number from "@/components/Number";
 import Operation from "@/components/Operation";
+import { calculator } from "@/constants/calculator";
+import { useState } from "react";
 
 export default function Home() {
+  const [result, setResult] = useState<string>("0");
+
+  const formatResult = (result: string): string => {
+    if (result.includes(",")) {
+      const valueAfterComma = result.slice(
+        result.indexOf(",") + 1,
+        result.length
+      );
+
+      const valueBeforeComma = result
+        .slice(0, result.indexOf(",") + 1)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+      return valueBeforeComma + valueAfterComma;
+    }
+
+    return result.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  };
+
   return (
     <div
       className="
@@ -12,33 +34,35 @@ export default function Home() {
       <div className="bg-[rgba(0,0,0,0.2)] rounded-lg overflow-hidden flex ">
         <div>
           <div className="text-end pb-2 pt-10 pr-2 font-bold text-[30px] bg-[#a9aca9]">
-            0
+            {formatResult(result)}
           </div>
           <div className="grid grid-cols-4 grid-rows-6 gap-1">
-            <Operation sign="%" />
-            <Operation sign="CE" />
-            <Operation sign="C" />
-            <Operation sign="BACK" />
-            <Operation sign="1/x" />
-            <Operation sign="x^2" />
-            <Operation sign="sqrt" />
-            <Operation sign="/" />
-            <Number number="7" />
-            <Number number="8" />
-            <Number number="9" />
-            <Operation sign="x" />
-            <Number number="4" />
-            <Number number="5" />
-            <Number number="6" />
-            <Operation sign="-" />
-            <Number number="1" />
-            <Number number="2" />
-            <Number number="3" />
-            <Operation sign="+" />
-            <Number number="+/-" />
-            <Number number="0" />
-            <Number number="," />
-            <Equal />
+            {calculator.map((item: string | number, index: number) => {
+              if (item == "=") {
+                return <Equal key={index} />;
+              } else if (
+                typeof item == "number" ||
+                item == "+/-" ||
+                item == ","
+              ) {
+                return (
+                  <Number
+                    key={index}
+                    number={item}
+                    setResult={setResult}
+                    result={result}
+                  />
+                );
+              }
+              return (
+                <Operation
+                  sign={item}
+                  key={index}
+                  result={result}
+                  setResult={setResult}
+                />
+              );
+            })}
           </div>
         </div>
 
