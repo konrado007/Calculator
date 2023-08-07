@@ -7,6 +7,8 @@ interface NumberProps {
   result: string;
   operation: string;
   firstNumber: string;
+  secondNumber: string;
+  restart: () => void;
 }
 
 const Number: React.FC<NumberProps> = ({
@@ -15,8 +17,14 @@ const Number: React.FC<NumberProps> = ({
   result,
   operation,
   firstNumber,
+  secondNumber,
+  restart,
 }) => {
   const updateResult = () => {
+    if (secondNumber) {
+      // it means that there is full equation and we want to restart all states
+      restart();
+    }
     if (result == "Cannot divide by zero") setResult("");
 
     const stringNumber = number.toString();

@@ -1,14 +1,25 @@
 import Equal from "@/components/Equal";
+import HistoryItem from "@/components/HistoryItem";
 import Number from "@/components/Number";
 import Operation from "@/components/Operation";
 import { calculator } from "@/constants/calculator";
+import { generateUniqueId } from "@/lib/generateUniqueId";
 import { useEffect, useState } from "react";
 
+export interface HistoryItemI {
+  id: string;
+  first: string;
+  operation: string;
+  second: string;
+  result: string;
+  onClick?: () => void;
+}
 export default function Home() {
   const [result, setResult] = useState<string>("0");
   const [operation, setOperation] = useState<string>("");
   const [firstNumber, setFirstNumber] = useState<string>("");
   const [secondNumber, setSecondNumber] = useState<string>("");
+  const [history, setHistory] = useState<HistoryItemI[] | []>([]);
 
   const formatResult = (result: string): string => {
     if (result.includes(",")) {
@@ -36,23 +47,20 @@ export default function Home() {
     }
   }, [result]);
 
-  useEffect(() => {
-    console.log(operation, result);
-  }, [operation, result]);
-
   const calculateResult = (isEqual?: boolean) => {
-    if (isEqual && result != "0") {
+    if (isEqual && result !== "0") {
       setSecondNumber(result);
     } else if (secondNumber) {
       setSecondNumber("");
       setFirstNumber(result);
     }
-    if (operation && (firstNumber != result || isEqual) && !secondNumber) {
+    if (operation && (firstNumber !== result || isEqual) && !secondNumber) {
       //calculate
-      let res = null;
+      let res = 0; // Initialize res with type annotation
 
       const firstNumberFloat = parseFloat(firstNumber.replace(",", "."));
       const resultFloat = parseFloat(result.replace(",", "."));
+
       switch (operation) {
         case "+":
           res = firstNumberFloat + resultFloat;
@@ -64,7 +72,7 @@ export default function Home() {
           res = firstNumberFloat * resultFloat;
           break;
         case "/":
-          if (result != "0") res = firstNumberFloat / resultFloat;
+          if (result !== "0") res = firstNumberFloat / resultFloat;
           else {
             setResult("Cannot divide by zero");
             return;
@@ -76,7 +84,19 @@ export default function Home() {
         default:
           break;
       }
-      if (res != null) {
+
+      if (res !== null) {
+        setHistory((prevHistory) => [
+          {
+            id: generateUniqueId(),
+            first: firstNumber,
+            operation,
+            second: result,
+            result: res.toString(),
+          },
+          ...prevHistory,
+        ]);
+
         !isEqual && setFirstNumber(res.toString());
         setResult(res.toString());
       }
@@ -87,11 +107,11 @@ export default function Home() {
 
   const calculateWithOneNumber = (sign: string) => {
     if (result != "0") {
-      if (secondNumber) {
+      if (secondNumber || operation) {
         setOperation("");
         setSecondNumber("");
       }
-      let res = null;
+      let res = 0;
       let front = "",
         back = "";
       const resultFloat = parseFloat(result.replace(",", "."));
@@ -115,6 +135,17 @@ export default function Home() {
           break;
       }
       if (res != null) {
+        setHistory((prevHistory) => [
+          {
+            id: generateUniqueId(),
+            first: front + result + back,
+            operation: "",
+            second: "",
+            result: res.toString(),
+          },
+          ...prevHistory,
+        ]);
+
         setFirstNumber(front + result + back);
         setResult(res.toString());
       }
@@ -158,6 +189,13 @@ export default function Home() {
                     setResult={setResult}
                     result={result}
                     firstNumber={firstNumber}
+                    secondNumber={secondNumber}
+                    restart={() => {
+                      setFirstNumber("");
+                      setOperation("");
+                      setResult("");
+                      setSecondNumber("");
+                    }}
                   />
                 );
               }
@@ -179,8 +217,35 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="h-full w-[300px] p-4">
-          <p className="font-semibold">History</p>
+        <div className="h-full w-[300px] ">
+          <div className="flex justify-between p-4">
+            <p className="font-semibold">History</p>
+            <p
+              className="font-semibold"
+              onClick={() => {
+                setHistory([]);
+              }}
+            >
+              Clear history
+            </p>
+          </div>
+
+          <div className="flex flex-col overflow-y-scroll no-scrollbar h-fit max-h-[420px]">
+            {history?.map((historyItem: HistoryItemI) => {
+              return (
+                <HistoryItem
+                  {...historyItem}
+                  key={historyItem.id}
+                  onClick={() => {
+                    setFirstNumber(historyItem.first);
+                    setOperation(historyItem.operation);
+                    setSecondNumber(historyItem.second);
+                    setResult(historyItem.result);
+                  }}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
