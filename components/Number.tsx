@@ -5,15 +5,28 @@ interface NumberProps {
   number: number | string;
   setResult: React.Dispatch<React.SetStateAction<string>>;
   result: string;
+  operation: string;
+  firstNumber: string;
 }
 
-const Number: React.FC<NumberProps> = ({ number, setResult, result }) => {
+const Number: React.FC<NumberProps> = ({
+  number,
+  setResult,
+  result,
+  operation,
+  firstNumber,
+}) => {
   const updateResult = () => {
+    if (result == "Cannot divide by zero") setResult("");
+
     const stringNumber = number.toString();
     if (stringNumber == "," && !result.includes(",")) {
       //make sure to add comma only once
       setResult((prevRes) => prevRes + ",");
-    } else if (stringNumber != "," && result == "0") {
+    } else if (
+      (stringNumber != "," && result == "0" && stringNumber != "+/-") ||
+      (operation && result == firstNumber)
+    ) {
       setResult(stringNumber);
     } else if (stringNumber == "+/-") {
       if (result != "0") {
