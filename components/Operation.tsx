@@ -7,6 +7,7 @@ interface NumberProps {
   setFirstNumber: React.Dispatch<React.SetStateAction<string>>;
   setSecondNumber: React.Dispatch<React.SetStateAction<string>>;
   calculateResult: () => void;
+  calculateWithOneNumber: (sign: string) => void;
   result: string;
   sign: string;
   secondNumber: string;
@@ -21,6 +22,7 @@ const Operation: React.FC<NumberProps> = ({
   result,
   calculateResult,
   secondNumber,
+  calculateWithOneNumber,
 }) => {
   const updateResult = () => {
     if (sign == "CE") {
@@ -43,9 +45,11 @@ const Operation: React.FC<NumberProps> = ({
           return prevResult.slice(0, prevResult.length - 1);
         });
       }
+    } else if (sign == "1/x" || sign == "x^2" || sign == "sqrt") {
+      calculateWithOneNumber(sign);
     } else {
-      calculateResult();
       setOperation(sign);
+      calculateResult();
     }
   };
   return (

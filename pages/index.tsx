@@ -36,6 +36,10 @@ export default function Home() {
     }
   }, [result]);
 
+  useEffect(() => {
+    console.log(operation, result);
+  }, [operation, result]);
+
   const calculateResult = (isEqual?: boolean) => {
     if (isEqual && result != "0") {
       setSecondNumber(result);
@@ -66,6 +70,9 @@ export default function Home() {
             return;
           }
           break;
+        case "%":
+          res = (firstNumberFloat / 100) * resultFloat;
+          break;
         default:
           break;
       }
@@ -75,6 +82,42 @@ export default function Home() {
       }
     } else {
       setFirstNumber(result);
+    }
+  };
+
+  const calculateWithOneNumber = (sign: string) => {
+    if (result != "0") {
+      if (secondNumber) {
+        setOperation("");
+        setSecondNumber("");
+      }
+      let res = null;
+      let front = "",
+        back = "";
+      const resultFloat = parseFloat(result.replace(",", "."));
+      switch (sign) {
+        case "1/x":
+          res = 1 / resultFloat;
+          front = "1/(";
+          back = ")";
+          break;
+        case "x^2":
+          res = resultFloat ** 2;
+          front = "sqr(";
+          back = ")";
+          break;
+        case "sqrt":
+          res = Math.sqrt(resultFloat);
+          front = "√(";
+          back = ")";
+          break;
+        default:
+          break;
+      }
+      if (res != null) {
+        setFirstNumber(front + result + back);
+        setResult(res.toString());
+      }
     }
   };
 
@@ -128,6 +171,7 @@ export default function Home() {
                   setOperation={setOperation}
                   setSecondNumber={setSecondNumber}
                   calculateResult={calculateResult}
+                  calculateWithOneNumber={calculateWithOneNumber}
                   secondNumber={secondNumber}
                 />
               );
