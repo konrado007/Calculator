@@ -22,6 +22,7 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryItemI[] | []>([]);
 
   const formatResult = (result: string): string => {
+    // formating result to format 000 000 only before comma
     if (result.includes(",")) {
       const valueAfterComma = result.slice(
         result.indexOf(",") + 1,
@@ -44,22 +45,27 @@ export default function Home() {
       setResult((prevResult) => {
         return prevResult.replace(".", ",");
       });
-    }
+    } // replacing . with , because making operations in default there is a .
   }, [result]);
 
   const calculateResult = (isEqual?: boolean) => {
-    if (isEqual && result !== "0") {
-      setSecondNumber(result);
-    } else if (secondNumber) {
+    if (isEqual && result !== "0" && operation) {
+      setSecondNumber(result); //when equal button pressed result changed and there is operation
+    } else if (secondNumber && !isEqual) {
+      //when going further with operations without clickcing equal button
       setSecondNumber("");
       setFirstNumber(result);
+    } else if (!operation && isEqual) {
+      //when user click number and press equals without any operation, it displays (10=) because, second number is set to " "
+      setSecondNumber(" ");
     }
+
     if (operation && (firstNumber !== result || isEqual) && !secondNumber) {
       //calculate
-      let res = 0; // Initialize res with type annotation
+      let res = 0;
 
-      const firstNumberFloat = parseFloat(firstNumber.replace(",", "."));
-      const resultFloat = parseFloat(result.replace(",", "."));
+      const firstNumberFloat = parseFloat(firstNumber.replace(",", ".")); //parsing string to float
+      const resultFloat = parseFloat(result.replace(",", ".")); //parsing string to float
 
       switch (operation) {
         case "+":
@@ -100,7 +106,7 @@ export default function Home() {
         !isEqual && setFirstNumber(res.toString());
         setResult(res.toString());
       }
-    } else {
+    } else if (result != "0") {
       setFirstNumber(result);
     }
   };
@@ -172,7 +178,7 @@ export default function Home() {
             </h3>
             <h2 className="w-full">{formatResult(result)}</h2>
           </div>
-          <div className="grid grid-cols-4 grid-rows-6 gap-1">
+          <div className="grid grid-cols-4 grid-rows-6 gap-1 ">
             {calculator.map((item: string | number, index: number) => {
               if (item == "=") {
                 return <Equal key={index} calculate={calculateResult} />;

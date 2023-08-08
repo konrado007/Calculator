@@ -1,4 +1,5 @@
 import React from "react";
+import { BsBackspaceFill } from "react-icons/bs";
 
 interface NumberProps {
   onClick?: () => void;
@@ -65,7 +66,24 @@ const Operation: React.FC<NumberProps> = ({
         items-center 
         justify-center"
     >
-      {sign}
+      {sign == "sqrt" ? (
+        <div className="relative">
+          <span className="absolute left-0 -top-[3px] text-[10px]">2</span>√x
+        </div>
+      ) : sign == "x^2" ? (
+        <div className="relative">
+          <span className="absolute -right-[5px] -top-[3px] text-[10px]">
+            2
+          </span>
+          x
+        </div>
+      ) : sign == "BACK" ? (
+        <div className="relative">
+          <BsBackspaceFill />
+        </div>
+      ) : (
+        sign
+      )}
     </div>
   );
 };

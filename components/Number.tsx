@@ -55,7 +55,7 @@ const Number: React.FC<NumberProps> = ({
   return (
     <div
       onClick={updateResult}
-      className="transition duration-300 px-6 py-5 bg-[#60495a] hover:bg-gray-400 flex items-center justify-center font-bold"
+      className="w-[88px] transition duration-300 px-6 py-5 bg-[#60495a] hover:bg-gray-400 flex items-center justify-center font-bold"
     >
       {number}
     </div>
